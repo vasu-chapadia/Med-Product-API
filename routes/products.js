@@ -3,6 +3,7 @@ const router = express.Router();
 const { Product } = require("../models/product");
 const { Types } = require("../models/types");
 const mongoose = require("mongoose");
+const auth = require("../middleware/auth");
 
 //Get All Products//Get By Types
 router.get("/", async (req, res, next) => {
@@ -21,7 +22,7 @@ router.get("/", async (req, res, next) => {
 
 //Create a Product
 // localhost:3000/products/
-router.post("/", async (req, res) => {
+router.post("/",auth, async (req, res) => {
   const type = await Types.findById(req.body.type);
   if (!type) return res.status(400).send("Invalid Type"); //Type Check
   let product = new Product({
@@ -53,7 +54,7 @@ router.get("/:id", async (req, res) => {
 //Update a Product
 //patch partial update
 //All body fields not mandatory
-router.patch("/:id", async (req, res) => {
+router.patch("/:id",auth, async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) {
     return res.status(400).send("Invalid Product Id!");
   }
@@ -78,7 +79,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 //Delete a Product
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",auth, async (req, res) => {
   const result = await Product.findByIdAndDelete(req.params.id);
   try {
     if (!result) {

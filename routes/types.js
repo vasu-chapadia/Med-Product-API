@@ -1,6 +1,7 @@
 const { Types } = require("../models/types");
 const express = require("express");
 const router = express.Router();
+const auth = require("../middleware/auth");
 
 router.get("/", async (req, res) => {
   const typeyList = await Types.find();
@@ -21,7 +22,7 @@ router.get("/:id", async (req, res) => {
   res.status(200).send(types);
 });
 
-router.post("/", async (req, res) => {
+router.post("/",auth, async (req, res) => {
   let type = new Types({
     name: req.body.name,
   });
