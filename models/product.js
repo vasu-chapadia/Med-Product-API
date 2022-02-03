@@ -33,7 +33,7 @@ const productSchema = mongoose.Schema({
   },
   comments: [
     {
-      text: String,
+      text: { type: String },
       postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     },
   ],
