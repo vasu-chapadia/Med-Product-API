@@ -19,12 +19,12 @@ const productSchema = mongoose.Schema({
     required: true,
   },
   dateCreated: {
-    type: String,
+    type: Date,
     default: Date.now,
     required: true,
   },
   expiryDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   likeCount: {

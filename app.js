@@ -12,11 +12,12 @@ app.use(morgan("tiny"));
 const typesRoutes = require("./routes/types");
 const productsRoutes = require("./routes/products");
 const userRoutes = require("./routes/user");
+const commentRoutes = require("./routes/productComment");
 
 app.use("/types", typesRoutes);
 app.use("/products", productsRoutes);
 app.use("/user", userRoutes);
-
+app.use("/products", commentRoutes);
 //Home route only localhost:3000/ or all the other routes which are not handled by express
 app.use((req, res, next) => {
   const err = new Error("Not Found");

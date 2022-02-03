@@ -5,13 +5,19 @@ const { Types } = require("../models/types");
 const mongoose = require("mongoose");
 const auth = require("../middleware/auth");
 
-//Get All Products//Get By Types
-router.get("/", async (req, res, next) => {
+//Get All Products//Get By Types//most recent products
+router.get("/", auth, async (req, res, next) => {
   // next(new Error('Cannot get'))
   //.find(query,projection) -projection for fields
   let filter = {};
   if (req.query.types) {
     filter = { type: req.query.types.split(",") };
+  }
+  if (req.query.types && req.query.sort) {
+    const productList = await Product.find(filter, { __v: 0 })
+      .populate("type")
+      .sort({ dateCreated: -1 });
+    res.status(200).send(productList);
   }
   const productList = await Product.find(filter, { __v: 0 }).populate("type");
   if (!productList) {
@@ -22,7 +28,7 @@ router.get("/", async (req, res, next) => {
 
 //Create a Product
 // localhost:3000/products/
-router.post("/",auth, async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const type = await Types.findById(req.body.type);
   if (!type) return res.status(400).send("Invalid Type"); //Type Check
   let product = new Product({
@@ -30,8 +36,8 @@ router.post("/",auth, async (req, res) => {
     description: req.body.description,
     price: req.body.price,
     type: req.body.type,
-    dateCreated: req.body.dateCreated,
-    expiryDate: req.body.expiryDate,
+    dateCreated: new Date(req.body.dateCreated),
+    expiryDate: new Date(req.body.expiryDate),
   });
 
   product = await product.save();
@@ -44,6 +50,9 @@ router.post("/",auth, async (req, res) => {
 //Get By Id
 router.get("/:id", async (req, res) => {
   // console.log(req.params.id);
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).send("Invalid Product Id!");
+  }
   const product = await Product.findById(req.params.id); //findOne//query
   if (!product) {
     res.status(500).json({ success: false });
@@ -54,7 +63,7 @@ router.get("/:id", async (req, res) => {
 //Update a Product
 //patch partial update
 //All body fields not mandatory
-router.patch("/:id",auth, async (req, res) => {
+router.patch("/:id", auth, async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) {
     return res.status(400).send("Invalid Product Id!");
   }
@@ -79,7 +88,7 @@ router.patch("/:id",auth, async (req, res) => {
 });
 
 //Delete a Product
-router.delete("/:id",auth, async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const result = await Product.findByIdAndDelete(req.params.id);
   try {
     if (!result) {

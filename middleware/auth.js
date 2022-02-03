@@ -7,7 +7,7 @@ const auth = (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     // console.log(token);
     const verify = jwt.verify(token, secret);
-    // console.log(verify.userType )
+    // console.log(verify.userId )
     if (verify.userType === "admin") {
       next();
     } else {
