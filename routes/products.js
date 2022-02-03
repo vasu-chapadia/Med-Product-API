@@ -5,25 +5,39 @@ const { Types } = require("../models/types");
 const mongoose = require("mongoose");
 const auth = require("../middleware/auth");
 
-//Get All Products//Get By Types//most recent products
+//Get All Products//Get By Types//most recent products//most liked
+// http://localhost:3000/products?types=61f9e92db64ff85fc1b37549&sort=latest&orderBy=likes
 router.get("/", auth, async (req, res, next) => {
+  // console.log(req.anyvariable);
   // next(new Error('Cannot get'))
   //.find(query,projection) -projection for fields
   let filter = {};
   if (req.query.types) {
     filter = { type: req.query.types.split(",") };
-  }
-  if (req.query.types && req.query.sort) {
+    const productList = await Product.find(filter, { __v: 0 }).populate("type");
+    return res.status(200).send(productList);
+  } else if (req.query.sort) {
+    const productList = await Product.find()
+      .populate("type")
+      .sort({ dateCreated: -1 }); //desc
+    return res.status(200).send(productList);
+  } else if (req.query.orderBy) {
+    const productList = await Product.find()
+      .populate("type")
+      .sort({ like: -1 }); //desc
+    return res.status(200).send(productList);
+  } else if (req.query.types && req.query.sort) {
     const productList = await Product.find(filter, { __v: 0 })
       .populate("type")
       .sort({ dateCreated: -1 });
-    res.status(200).send(productList);
+    return res.status(200).send(productList);
+  } else if (req.query.types && req.query.sort && req.query.orderBy) {
+    const productList = await Product.find(filter, { __v: 0 })
+      .populate("type")
+      .sort({ dateCreated: desc });
+    return res.status(200).send(productList);
   }
-  const productList = await Product.find(filter, { __v: 0 }).populate("type");
-  if (!productList) {
-    res.status(500).json({ success: false });
-  }
-  res.status(200).send(productList);
+  return res.status(500).json({ success: false });
 });
 
 //Create a Product
@@ -100,6 +114,25 @@ router.delete("/:id", auth, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error" });
   }
+});
+
+router.put("/like", auth, async (req, res) => {
+  const product = await Product.findById(req.body.productId);
+  if (!product) return res.status(400).send("Invalid Product!");
+
+  const updatedProduct = await Product.findByIdAndUpdate(
+    req.body.productId,
+    {
+      // $push: { like:  },
+      $inc: { like: 1 },
+    },
+    { new: true } //true to return the modified document rather than the original
+  );
+  if (!updatedProduct) {
+    return res.status(500).send("the product cannot be updated!");
+  }
+
+  res.send(updatedProduct);
 });
 
 module.exports = router;

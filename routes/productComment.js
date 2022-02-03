@@ -14,7 +14,7 @@ router.post("/:product_id/comments/create", async (req, res) => {
   }
   const product = await Product.findOne({ _id: req.params.product_id });
   if (!product) return res.status(400).send("Product With Given ID Not Found"); //Product Check
-  res.send("Added");
+  res.send(product);
 });
 
 module.exports = router;

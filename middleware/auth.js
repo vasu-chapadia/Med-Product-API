@@ -1,3 +1,4 @@
+const { response } = require("express");
 const jwt = require("jsonwebtoken");
 require("dotenv/config");
 
@@ -9,6 +10,7 @@ const auth = (req, res, next) => {
     const verify = jwt.verify(token, secret);
     // console.log(verify.userId )
     if (verify.userType === "admin") {
+      // req.anyvariable = verify.userId;
       next();
     } else {
       return res.status(401).json({ message: "Invalid Token" });

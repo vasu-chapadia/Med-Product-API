@@ -6,7 +6,7 @@ require("dotenv/config");
 
 //Middleware
 app.use(express.json()); //body-parser alt
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 
 //Routes
 const typesRoutes = require("./routes/types");
@@ -18,6 +18,7 @@ app.use("/types", typesRoutes);
 app.use("/products", productsRoutes);
 app.use("/user", userRoutes);
 app.use("/products", commentRoutes);
+
 //Home route only localhost:3000/ or all the other routes which are not handled by express
 app.use((req, res, next) => {
   const err = new Error("Not Found");

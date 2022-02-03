@@ -27,9 +27,13 @@ const productSchema = mongoose.Schema({
     type: Date,
     required: true,
   },
-  likeCount: {
+  like: {
     type: Number,
+    default: 0,
   },
+  comment:[{
+    type: String, 
+  }]
 });
 
 exports.Product = mongoose.model("Product", productSchema);
