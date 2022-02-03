@@ -31,9 +31,12 @@ const productSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
-  comment:[{
-    type: String, 
-  }]
+  comments: [
+    {
+      text: String,
+      postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    },
+  ],
 });
 
 exports.Product = mongoose.model("Product", productSchema);

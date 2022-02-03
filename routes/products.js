@@ -116,6 +116,7 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
+//Like Product
 router.put("/like", auth, async (req, res) => {
   const product = await Product.findById(req.body.productId);
   if (!product) return res.status(400).send("Invalid Product!");
@@ -132,6 +133,27 @@ router.put("/like", auth, async (req, res) => {
     return res.status(500).send("the product cannot be updated!");
   }
 
+  res.send(updatedProduct);
+});
+
+//Comment Add
+router.put("/comments", async (req, res) => {
+  const comment = {
+    text: req.body.text,
+    postedBy: req.anyvariable,
+  };
+  const product = await Product.findById(req.body.productId);
+  if (!product) return res.status(400).send("Invalid Product!");
+  const updatedProduct = await Product.findByIdAndUpdate(
+    req.body.productId,
+    {
+      $push: { comments: comment },
+    },
+    { new: true } //true to return the modified document rather than the original
+  ).populate("comments.postedBy");
+  if (!updatedProduct) {
+    return res.status(500).send("the product cannot be updated!");
+  }
   res.send(updatedProduct);
 });
 
